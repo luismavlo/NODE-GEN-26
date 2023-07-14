@@ -1,35 +1,16 @@
 const express = require("express");
+const productController = require("./../controllers/products.controller");
 
 const router = express.Router();
 
-const findProducts = (req, res) => {
-  res.status(200).json({
-    message: "hello from the get route!",
-  });
-};
+router.get("/", productController.findProducts);
 
-const createProduct = (req, res) => {
-  const product = req.body;
+router.post("/", productController.createProduct);
 
-  res.status(201).json({
-    message: "hello from the post route",
-    product,
-  });
-};
+router.get("/:id", productController.findProduct);
 
-const findProduct = (req, res) => {
-  const id = req.params.id;
+router.patch("/:id", productController.updateProduct);
 
-  res.status(200).json({
-    message: "hello from the get route with id",
-    id,
-  });
-};
-
-router.get("/", findProducts);
-
-router.post("/", createProduct);
-
-router.get("/:id", findProduct);
+router.delete("/:id", productController.deleteProduct);
 
 module.exports = router;
