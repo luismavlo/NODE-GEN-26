@@ -1,5 +1,8 @@
 exports.findProducts = (req, res) => {
+  const { requestTime } = req;
+
   return res.status(200).json({
+    requestTime,
     message: "hello from the get route!",
   });
 };
@@ -32,9 +35,11 @@ exports.updateProduct = (req, res) => {
 };
 
 exports.deleteProduct = (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
+  const { requestTime } = req;
 
   res.status(200).json({
+    requestTime,
     message: "hello from the delete route",
     id,
   });
