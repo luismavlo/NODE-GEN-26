@@ -1,36 +1,30 @@
 const express = require("express");
+//controllers
 const productController = require("./../controllers/products.controller");
 
+//middlewares
+const validationMiddleware = require("./../middlewares/validations.middleware");
 const router = express.Router();
 
-const validProduct = (req, res, next) => {
-  const { name, price } = req.body;
+router
+  .route("/")
+  .get(productController.findProducts)
+  .post(validationMiddleware.validProduct, productController.createProduct);
 
-  if (!name) {
-    return res.status(400).json({
-      status: "error",
-      message: "the name is required",
-    });
-  }
-
-  if (!price) {
-    return res.status(400).json({
-      status: "error",
-      message: "the price is required",
-    });
-  }
-
-  next();
-};
-
-router.get("/", productController.findProducts);
-
-router.post("/", validProduct, productController.createProduct);
-
-router.get("/:id", productController.findProduct);
-
-router.patch("/:id", productController.updateProduct);
-
-router.delete("/:id", productController.deleteProduct);
+router
+  .route("/:id")
+  .get(productController.findProduct)
+  .patch(validationMiddleware.validProduct, productController.updateProduct)
+  .delete(productController.deleteProduct);
 
 module.exports = router;
+
+//:::::::::::::::::::::::::::::::::::::::::
+
+// router.get("/", productController.findProducts);
+
+// router.post(
+//   "/",
+//   validationMiddleware.validProduct,
+//   productController.createProduct
+// );

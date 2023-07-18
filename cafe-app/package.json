@@ -12,7 +12,8 @@
   "author": "Luis Miguel Avendaño",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "sequelize": "^6.32.1"
   },
   "devDependencies": {
     "morgan": "^1.10.0",

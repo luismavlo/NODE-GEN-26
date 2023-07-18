@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: dbproductgen26
+    container_name: productgen26
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
