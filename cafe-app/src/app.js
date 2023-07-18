@@ -10,9 +10,7 @@ app.use(morgan("dev"));
 
 const getTimeRequest = (req, res, next) => {
   const date = new Date();
-
   req.requestTime = date;
-
   next();
 };
 
@@ -22,6 +20,4 @@ app.use("/api/v1/products", productRouter);
 // app.use("/api/v1/users", userRouter);
 // app.use("/api/v1/categories", categoriesRouter)
 
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
-});
+module.exports = app;
