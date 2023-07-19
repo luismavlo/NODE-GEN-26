@@ -52,31 +52,120 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-exports.findProduct = (req, res) => {
-  const id = req.params.id;
+exports.findProduct = async (req, res) => {
+  try {
+    // 1. traerme el id de los parametros
+    const { id } = req.params;
 
-  res.status(200).json({
-    message: "hello from the get route with id",
-    id,
-  });
+    //2 buscar el producto con dicho id y status true, es decir que exista
+    const product = await Product.findOne({
+      where: {
+        id,
+        status: true,
+      },
+    });
+    //3 valido si no existe el producto para enviar un error
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: `product with id ${id} not found!`,
+      });
+    }
+    //4. si existe se ejecuta esto y se envia la respuesta al cliente
+    return res.status(200).json({
+      status: "success",
+      message: "product retrieved successfully!",
+      product,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Something went very wrong!",
+      error,
+    });
+  }
 };
 
-exports.updateProduct = (req, res) => {
-  const id = req.params.id;
+exports.updateProduct = async (req, res) => {
+  try {
+    //1. me traigo el id del producto a actualizar
+    const { id } = req.params;
+    //2. me traigo los datos a actualizar
+    const { quantity, price, isNew } = req.body;
 
-  res.status(200).json({
-    message: "hello from the update route with id",
-    id,
-  });
+    //3. buscar el producto a actualizar
+    const product = await Product.findOne({
+      where: {
+        id,
+        status: true,
+      },
+    });
+    //4. validar si existe el producto, en caso de que no, enviar un error.
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: `product with id ${id} not found!`,
+      });
+    }
+    //5. actualizar el producto encontrado
+    const productUpdated = await product.update({
+      quantity,
+      price,
+      isNew,
+    });
+
+    //6. enviar la respuesta al cliente
+    res.status(200).json({
+      status: "success",
+      message: "product updated successfully!",
+      product: productUpdated,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Something went very wrong!",
+      error,
+    });
+  }
 };
 
-exports.deleteProduct = (req, res) => {
-  const { id } = req.params;
-  const { requestTime } = req;
+exports.deleteProduct = async (req, res) => {
+  try {
+    //1. me traigo el id del producto a eliminar
+    const { id } = req.params;
 
-  res.status(200).json({
-    requestTime,
-    message: "hello from the delete route",
-    id,
-  });
+    //2. buscar el producto a eliminar
+    const product = await Product.findOne({
+      where: {
+        id,
+        status: true,
+      },
+    });
+
+    //3. validar si existe el producto, en caso de que no, enviar un error.
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: `product with id ${id} not found!`,
+      });
+    }
+
+    //4. eliminar el producto encontrado, Es decir producto con p minuscula
+    // await product.destroy();
+    await product.update({ status: false });
+
+    res.status(200).json({
+      status: "success",
+      message: "product deleted successfully!",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: "fail",
+      message: "Something went very wrong!",
+      error,
+    });
+  }
 };
