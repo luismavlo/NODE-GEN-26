@@ -1,13 +1,15 @@
 const express = require('express');
 
+const userController = require('./../controllers/user.controller');
+
 const router = express.Router();
 
-//buscar todos, findAllUsers
+router.get('/', userController.findAllUsers);
 
-//buscar por id findOneUser
-
-//actualizar updateUser
-
-//eliminar deleteUser
+router
+  .route('/:id')
+  .get(userController.findOneUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;
