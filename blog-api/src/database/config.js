@@ -1,7 +1,5 @@
 const { Sequelize } = require('sequelize');
 
-console.log(process.env.DB_DIALECT);
-
 const db = new Sequelize({
   dialect: process.env.DB_DIALECT,
   database: process.env.DB_DATABASE,
