@@ -24,21 +24,7 @@ exports.findAllUsers = async (req, res) => {
 
 exports.findOneUser = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'active',
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: `User with id: ${id} not found`,
-      });
-    }
+    const { user } = req;
 
     res.status(200).json({
       status: 'success',
@@ -56,22 +42,8 @@ exports.findOneUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { user } = req;
     const { name, description } = req.body;
-
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'active',
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({
-        status: 'error',
-        message: `User with id: ${id} not found`,
-      });
-    }
 
     await user.update({ name, description });
 
