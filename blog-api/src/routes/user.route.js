@@ -5,6 +5,7 @@ const userController = require('./../controllers/user.controller');
 
 //middlewares
 const userMiddleware = require('./../middlewares/user.middleware');
+const validationMiddleware = require('./../middlewares/validations.middleware');
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router
   .use('/:id', userMiddleware.validUser)
   .route('/:id')
   .get(userController.findOneUser)
-  .patch(userController.updateUser)
+  .patch(validationMiddleware.updateUserValidation, userController.updateUser)
   .delete(userController.deleteUser);
 
 module.exports = router;
