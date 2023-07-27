@@ -22,3 +22,33 @@ exports.updateUserValidation = [
     .withMessage('Description must be at least 10 characters long'),
   validFields,
 ];
+
+exports.createUserValidation = [
+  body('name').notEmpty().withMessage('Name is required'),
+  body('email')
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Email must be a correct format'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must have a least 8 characters')
+    .matches(/[a-zA-Z]/)
+    .withMessage('Password must have cotain a least one letter'),
+  body('description').notEmpty().withMessage('Description is required'),
+  validFields,
+];
+
+exports.loginUserValidation = [
+  body('email')
+    .notEmpty()
+    .withMessage('Email is required')
+    .isEmail()
+    .withMessage('Email must be a correct format'),
+  body('password')
+    .isLength({ min: 8 })
+    .withMessage('Password must have a least 8 characters')
+    .matches(/[a-zA-Z]/)
+    .withMessage('Password must have cotain a least one letter'),
+  validFields,
+];
