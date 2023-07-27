@@ -1,29 +1,24 @@
 const AppError = require('../utils/appError');
 const User = require('../models/user.model');
+const catchAsync = require('../utils/catchAsync');
 
-exports.validUser = async (req, res, next) => {
-  try {
-    const { id } = req.params;
+exports.validUser = catchAsync(async (req, res, next) => {
+  //1. traer el id de la req.params, este es el id del usuario
+  const { id } = req.params;
 
-    const user = await User.findOne({
-      where: {
-        id,
-        status: 'active',
-      },
-    });
+  //2. buscar el usuario con status active y el id recibido
+  const user = await User.findOne({
+    where: {
+      id,
+      status: 'active',
+    },
+  });
 
-    if (!user) {
-      return next(new AppError(`User with id: ${id} not found`, 404));
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong',
-      error,
-    });
+  //3. valido que si no existe envio el error
+  if (!user) {
+    return next(new AppError(`User with id: ${id} not found`, 404));
   }
-};
+  //4. adjunto el usuario por la req, y le doy paso para que avance con el next
+  req.user = user;
+  next();
+});

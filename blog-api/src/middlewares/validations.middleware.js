@@ -52,3 +52,17 @@ exports.loginUserValidation = [
     .withMessage('Password must have cotain a least one letter'),
   validFields,
 ];
+
+exports.updatePasswordValidation = [
+  body('currentPassword')
+    .isLength({ min: 8 })
+    .withMessage('Password must have a least 8 characters')
+    .matches(/[a-zA-Z]/)
+    .withMessage('Password must have cotain a least one letter'),
+  body('newPassword')
+    .isLength({ min: 8 })
+    .withMessage('Password must have a least 8 characters')
+    .matches(/[a-zA-Z]/)
+    .withMessage('Password must have cotain a least one letter'),
+  validFields,
+];

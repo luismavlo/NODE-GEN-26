@@ -68,3 +68,37 @@ exports.signIn = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  //1. traerme el usuario que viene de la req, del midleware
+  const { user } = req;
+
+  //2. traerme los datos de la req.body
+  const { currentPassword, newPassword } = req.body;
+
+  //3. validar si la contraseña actual y nueva son iguales enviar un error
+  if (currentPassword === newPassword) {
+    return next(new AppError('The password cannot be equals', 400));
+  }
+
+  //4. validar si la contraseña actual es igual a la contraseña en bd
+  if (!(await bcrypt.compare(currentPassword, user.password))) {
+    return next(new AppError('Incorrect password', 401));
+  }
+
+  //5. encriptar la nueva contraseña
+  const salt = await bcrypt.genSalt(12);
+  const encryptedPassword = await bcrypt.hash(newPassword, salt);
+
+  //6. actualizar el usuario que viene de la req
+  await user.update({
+    password: encryptedPassword,
+    passwordChangedAt: new Date(),
+  });
+
+  //7. enviar el mensaje al cliente
+  return res.status(200).json({
+    status: 'success',
+    message: 'The user password was updated successfully',
+  });
+});
