@@ -66,3 +66,9 @@ exports.updatePasswordValidation = [
     .withMessage('Password must have cotain a least one letter'),
   validFields,
 ];
+
+exports.createPostValidation = [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('content').notEmpty().withMessage('Content is required'),
+  validFields,
+];
