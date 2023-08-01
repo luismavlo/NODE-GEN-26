@@ -1,10 +1,10 @@
 const catchAsync = require('../utils/catchAsync');
-const Post = require('../models/post.model');
+const { Post, postStatus } = require('../models/post.model');
 
 exports.findAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.findAll({
     where: {
-      status: 'active',
+      status: postStatus.active,
     },
     attributes: {
       exclude: ['status'],
@@ -32,13 +32,33 @@ exports.createPost = catchAsync(async (req, res, next) => {
 });
 
 exports.findOnePost = catchAsync(async (req, res, next) => {
-  return res.status(200).json(/* valor a retornar */);
+  const { post } = req;
+
+  return res.status(200).json({
+    status: 'sucess',
+    post,
+  });
 });
 
 exports.updatePost = catchAsync(async (req, res, next) => {
-  return res.status(200).json(/* valor a retornar */);
+  const { post } = req;
+  const { title, content } = req.body;
+
+  await post.update({ title, content });
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'the post has been updated',
+  });
 });
 
 exports.deletePost = catchAsync(async (req, res, next) => {
-  return res.status(200).json(/* valor a retornar */);
+  const { post } = req;
+
+  await post.update({ status: postStatus.disabled });
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'the post has been deleted!',
+  });
 });

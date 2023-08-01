@@ -27,4 +27,9 @@ const Post = db.define('posts', {
   },
 });
 
-module.exports = Post;
+const postStatus = Object.freeze({
+  active: 'active',
+  disabled: 'disabled',
+});
+
+module.exports = { Post, postStatus };

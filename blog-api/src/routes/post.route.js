@@ -6,6 +6,7 @@ const postController = require('../controllers/post.controller');
 //middlewares
 const authMiddleware = require('./../middlewares/auth.middleware');
 const validationMiddleware = require('./../middlewares/validations.middleware');
+const postMiddleware = require('./../middlewares/post.middleware');
 
 const router = express.Router();
 
@@ -21,9 +22,10 @@ router
 router.use(authMiddleware.protect);
 
 router
+  .use('/:id', postMiddleware.validPost)
   .route('/:id')
   .get(postController.findOnePost)
-  .patch(postController.updatePost)
+  .patch(validationMiddleware.createPostValidation, postController.updatePost)
   .delete(postController.deletePost);
 
 module.exports = router;
