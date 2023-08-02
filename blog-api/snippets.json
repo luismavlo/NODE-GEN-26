@@ -63,12 +63,22 @@
   "create a node router file": {
     "prefix": "router",
     "body": [
-      "const ${1:controllerFile} = require('../controllers/${2:controllerFile}');",
       "const express = require('express');",
+      "",
+      "//controllers",
+      "const ${1:controllerFile} = require('../controllers/${2:controllerFile}');",
       "",
       "const router = express.Router();",
       "",
-      "router.get('/', ${1:controllerFile}.findAll)",
+      "router.route('/')",
+      "      .get(${1:controllerFile}.${3:findAll})",
+      "      .post(${1:controllerFile}.${4:create})",
+      "",
+      "router.route('/:id')",
+      "      .get(${1:controllerFile}.${5:findOne})",
+      "      .patch(${1:controllerFile}.${6:update})",
+      "      .delete(${1:controllerFile}.${7:delete})",
+      "",
       "",
       "module.exports = router"
     ]

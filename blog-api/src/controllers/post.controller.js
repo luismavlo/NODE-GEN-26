@@ -1,5 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const { Post, postStatus } = require('../models/post.model');
+const User = require('../models/user.model');
+const Comment = require('../models/comment.model');
 
 exports.findAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.findAll({
@@ -9,6 +11,19 @@ exports.findAllPosts = catchAsync(async (req, res, next) => {
     attributes: {
       exclude: ['status'],
     },
+    include: [
+      {
+        model: User,
+      },
+      {
+        model: Comment,
+        include: [
+          {
+            model: User,
+          },
+        ],
+      },
+    ],
   });
 
   return res.status(200).json({
