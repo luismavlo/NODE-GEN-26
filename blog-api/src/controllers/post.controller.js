@@ -1,4 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
+
+const { db } = require('./../database/config');
+
 const { Post, postStatus } = require('../models/post.model');
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
@@ -40,8 +43,51 @@ exports.findAllPosts = catchAsync(async (req, res, next) => {
   });
 });
 
-//hacer una funcionalidad, para traerse los posts del usuario en sesion;
-//deben incluior los comentarios de cada post y el usuario que hizo el comentario;
+exports.findMyPosts = catchAsync(async (req, res, next) => {
+  const { id } = req.sessionUser;
+
+  const posts = await Post.findAll({
+    where: {
+      status: postStatus.active,
+      userId: id,
+    },
+    include: [
+      {
+        model: Comment,
+        attributes: {
+          exclude: ['status', 'postId', 'userId'],
+        },
+        include: [
+          {
+            model: User,
+            attributes: ['id', 'name', 'profileImgUrl', 'description'],
+          },
+        ],
+      },
+    ],
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    results: posts.length,
+    posts,
+  });
+});
+
+exports.findUserPosts = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  //TODO: esto esta mal, esto es vulverable a SQL injection, CORREGIR
+  const query = `SELECT id, title, content, "createdAt", "updatedAt"  FROM posts WHERE "userId" = ${id} AND status = 'active'`;
+
+  const [rows, fields] = await db.query(query);
+
+  return res.status(200).json({
+    status: 'success',
+    results: fields.rowCount,
+    posts: rows,
+  });
+});
 
 exports.createPost = catchAsync(async (req, res, next) => {
   const { title, content } = req.body;
