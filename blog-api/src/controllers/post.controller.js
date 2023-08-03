@@ -9,21 +9,28 @@ exports.findAllPosts = catchAsync(async (req, res, next) => {
       status: postStatus.active,
     },
     attributes: {
-      exclude: ['status'],
+      exclude: ['status', 'userId'],
     },
     include: [
       {
         model: User,
+        attributes: ['id', 'name', 'profileImgUrl', 'description'],
       },
       {
         model: Comment,
+        attributes: {
+          exclude: ['status', 'postId', 'userId'],
+        },
         include: [
           {
             model: User,
+            attributes: ['id', 'name', 'profileImgUrl', 'description'],
           },
         ],
       },
     ],
+    order: [['createdAt', 'DESC']],
+    limit: 10,
   });
 
   return res.status(200).json({
@@ -32,6 +39,9 @@ exports.findAllPosts = catchAsync(async (req, res, next) => {
     posts,
   });
 });
+
+//hacer una funcionalidad, para traerse los posts del usuario en sesion;
+//deben incluior los comentarios de cada post y el usuario que hizo el comentario;
 
 exports.createPost = catchAsync(async (req, res, next) => {
   const { title, content } = req.body;

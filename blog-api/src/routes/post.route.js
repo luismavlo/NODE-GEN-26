@@ -21,6 +21,8 @@ router
 
 router.use(authMiddleware.protect);
 
+// router.get('/me', postController.findMyPosts);
+
 router
   .use('/:id', postMiddleware.validPost)
   .route('/:id')
