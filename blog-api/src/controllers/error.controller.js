@@ -1,4 +1,5 @@
 const AppError = require('./../utils/appError');
+const Error = require('./../models/error.model');
 
 const handleCastError22001 = () =>
   new AppError('The number of characters is greater than expected', 400);
@@ -15,8 +16,13 @@ const handleCastError22P02 = () =>
 const handleCastError23505 = () =>
   new AppError('Duplicate fild value: please use another value.', 400);
 
-const sendErrorDev = (err, res) => {
-  console.log(err);
+const sendErrorDev = async (err, res) => {
+  await Error.create({
+    status: err.status,
+    message: err.message,
+    stack: err.stack,
+  });
+
   return res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
