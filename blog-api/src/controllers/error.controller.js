@@ -16,8 +16,8 @@ const handleCastError22P02 = () =>
 const handleCastError23505 = () =>
   new AppError('Duplicate fild value: please use another value.', 400);
 
-const sendErrorDev = async (err, res) => {
-  await Error.create({
+const sendErrorDev = (err, res) => {
+  Error.create({
     status: err.status,
     message: err.message,
     stack: err.stack,
