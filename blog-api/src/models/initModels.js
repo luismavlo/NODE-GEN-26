@@ -1,5 +1,6 @@
 const Comment = require('./comment.model');
 const { Post } = require('./post.model');
+const PostImg = require('./postImg.model');
 const User = require('./user.model');
 
 const initModel = () => {
@@ -11,6 +12,9 @@ const initModel = () => {
 
   User.hasMany(Comment);
   Comment.belongsTo(User);
+
+  Post.hasMany(PostImg);
+  PostImg.belongsTo(Post);
 };
 
 module.exports = initModel;
