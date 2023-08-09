@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post(
   '/signup',
-  upload.single('profileImgUrl'),
+  upload.single('profileImgUrl'), //?al utilizar el upload de multer, me va a permitir tener acceso a la req.file
   validationMiddleware.createUserValidation,
   authController.signUp
 );

@@ -1,10 +1,15 @@
 const catchAsync = require('../utils/catchAsync');
+const crypto = require('node:crypto');
 
 const { db } = require('./../database/config');
 
 const { Post, postStatus } = require('../models/post.model');
 const User = require('../models/user.model');
 const Comment = require('../models/comment.model');
+const PostImg = require('../models/postImg.model');
+
+const storage = require('../utils/firebase');
+const { ref, uploadBytes } = require('firebase/storage');
 
 exports.findAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.findAll({
@@ -94,6 +99,21 @@ exports.createPost = catchAsync(async (req, res, next) => {
   const { id: userId } = req.sessionUser;
 
   const post = await Post.create({ title, content, userId });
+
+  const postImgsPromises = req.files.map(async (file) => {
+    const imgRef = ref(
+      storage,
+      `posts/${crypto.randomUUID()}-${file.originalname}`
+    );
+    const imgUploaded = await uploadBytes(imgRef, file.buffer);
+
+    return await PostImg.create({
+      postId: post.id,
+      postImgUrl: imgUploaded.metadata.fullPath,
+    });
+  });
+
+  await Promise.all(postImgsPromises);
 
   return res.status(201).json({
     status: 'success',
