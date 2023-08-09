@@ -125,6 +125,17 @@ exports.createPost = catchAsync(async (req, res, next) => {
 exports.findOnePost = catchAsync(async (req, res, next) => {
   const { post } = req;
 
+  //necesito que en este post venga las fotos pertenecientes a este post (relacion)
+
+  //necesito que resuelvan esas urls de los postImgs
+
+  //necesito que resuelvan la url del profileImgUrl del usuario
+
+  //van a adjuntar los comentarios relacionados con ese post, y a cada comentario
+  //le deben adjuntar el profileImgUrl del usuario que lo hizo
+
+  //necesito que resuelvan la url del profileImgUrl del usuario de cada comentario
+
   return res.status(200).json({
     status: 'sucess',
     post,
