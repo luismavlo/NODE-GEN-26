@@ -2,6 +2,8 @@ const catchAsync = require('../utils/catchAsync');
 const { Post, postStatus } = require('../models/post.model');
 const AppError = require('../utils/appError');
 const User = require('../models/user.model');
+const PostImg = require('../models/postImg.model');
+const Comment = require('../models/comment.model');
 
 exports.validPost = catchAsync(async (req, res, next) => {
   //1. traer info de la req.params
@@ -44,6 +46,18 @@ exports.validPostPerFindOne = catchAsync(async (req, res, next) => {
       {
         model: User,
         attributes: ['id', 'name', 'profileImgUrl', 'description'],
+      },
+      {
+        model: PostImg,
+      },
+      {
+        model: Comment,
+        include: [
+          {
+            model: User,
+            attributes: ['id', 'name', 'profileImgUrl', 'description'],
+          },
+        ],
       },
     ],
   });

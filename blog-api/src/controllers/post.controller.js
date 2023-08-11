@@ -9,7 +9,7 @@ const Comment = require('../models/comment.model');
 const PostImg = require('../models/postImg.model');
 
 const storage = require('../utils/firebase');
-const { ref, uploadBytes } = require('firebase/storage');
+const { ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 
 exports.findAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.findAll({
@@ -25,21 +25,34 @@ exports.findAllPosts = catchAsync(async (req, res, next) => {
         attributes: ['id', 'name', 'profileImgUrl', 'description'],
       },
       {
-        model: Comment,
-        attributes: {
-          exclude: ['status', 'postId', 'userId'],
-        },
-        include: [
-          {
-            model: User,
-            attributes: ['id', 'name', 'profileImgUrl', 'description'],
-          },
-        ],
+        model: PostImg,
       },
     ],
     order: [['createdAt', 'DESC']],
     limit: 10,
   });
+
+  const postPromises = posts.map(async (post) => {
+    const imgRefUser = ref(storage, post.user.profileImgUrl);
+    const urlUser = await getDownloadURL(imgRefUser);
+
+    post.user.profileImgUrl = urlUser;
+
+    const postImgsPromises = post.PostImgs.map(async (postImg) => {
+      const imgRef = ref(storage, postImg.postImgUrl);
+      const url = await getDownloadURL(imgRef);
+
+      postImg.postImgUrl = url;
+      return postImg;
+    });
+
+    const postImgsResolved = await Promise.all(postImgsPromises);
+    post.PostImgs = postImgsResolved;
+
+    return post;
+  });
+
+  await Promise.all(postPromises);
 
   return res.status(200).json({
     status: 'success',
@@ -58,19 +71,29 @@ exports.findMyPosts = catchAsync(async (req, res, next) => {
     },
     include: [
       {
-        model: Comment,
-        attributes: {
-          exclude: ['status', 'postId', 'userId'],
-        },
-        include: [
-          {
-            model: User,
-            attributes: ['id', 'name', 'profileImgUrl', 'description'],
-          },
-        ],
+        model: PostImg,
       },
     ],
   });
+
+  if (posts.length > 0) {
+    const postPromises = posts.map(async (post) => {
+      const postImgsPromises = post.PostImgs.map(async (postImg) => {
+        const imgRef = ref(storage, postImg.postImgUrl);
+        const url = await getDownloadURL(imgRef);
+
+        postImg.postImgUrl = url;
+        return postImg;
+      });
+
+      const postImgsResolved = await Promise.all(postImgsPromises);
+      post.PostImgs = postImgsResolved;
+
+      return post;
+    });
+
+    await Promise.all(postPromises);
+  }
 
   return res.status(200).json({
     status: 'success',
@@ -81,11 +104,13 @@ exports.findMyPosts = catchAsync(async (req, res, next) => {
 
 exports.findUserPosts = catchAsync(async (req, res, next) => {
   const { id } = req.params;
+  const { status } = req.query;
 
-  //TODO: esto esta mal, esto es vulverable a SQL injection, CORREGIR
-  const query = `SELECT id, title, content, "createdAt", "updatedAt"  FROM posts WHERE "userId" = ${id} AND status = 'active'`;
+  const query = `SELECT id, title, content, "createdAt", "updatedAt"  FROM posts WHERE "userId" = :iduser AND status = :status`;
 
-  const [rows, fields] = await db.query(query);
+  const [rows, fields] = await db.query(query, {
+    replacements: { iduser: id, status: status },
+  });
 
   return res.status(200).json({
     status: 'success',
@@ -124,17 +149,37 @@ exports.createPost = catchAsync(async (req, res, next) => {
 
 exports.findOnePost = catchAsync(async (req, res, next) => {
   const { post } = req;
+  let postImgsPromises = [];
+  let userImgsCommentPromises = [];
 
-  //necesito que en este post venga las fotos pertenecientes a este post (relacion)
+  const imgRefUserProfile = ref(storage, post.user.profileImgUrl);
+  const urlUserProfile = await getDownloadURL(imgRefUserProfile);
 
-  //necesito que resuelvan esas urls de los postImgs
+  post.user.profileImgUrl = urlUserProfile;
 
-  //necesito que resuelvan la url del profileImgUrl del usuario
+  if (post.PostImgs?.length > 0) {
+    postImgsPromises = post.PostImgs.map(async (postImg) => {
+      const imgRef = ref(storage, postImg.postImgUrl);
+      const url = await getDownloadURL(imgRef);
 
-  //van a adjuntar los comentarios relacionados con ese post, y a cada comentario
-  //le deben adjuntar el profileImgUrl del usuario que lo hizo
+      postImg.postImgUrl = url;
+      return postImg;
+    });
+  }
 
-  //necesito que resuelvan la url del profileImgUrl del usuario de cada comentario
+  if (post.comments?.length > 0) {
+    userImgsCommentPromises = post.comments.map(async (comment) => {
+      const imgRef = ref(storage, comment.user.profileImgUrl);
+      const url = await getDownloadURL(imgRef);
+
+      comment.user.profileImgUrl = url;
+      return comment;
+    });
+  }
+
+  const arrPromises = [...postImgsPromises, ...userImgsCommentPromises];
+
+  await Promise.all(arrPromises);
 
   return res.status(200).json({
     status: 'sucess',

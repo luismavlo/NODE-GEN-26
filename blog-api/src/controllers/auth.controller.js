@@ -5,10 +5,14 @@ const generateJWT = require('./../utils/jwt');
 const storage = require('../utils/firebase');
 const User = require('./../models/user.model');
 
-const { ref, uploadBytes } = require('firebase/storage');
+const { ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 
 exports.signUp = catchAsync(async (req, res, next) => {
   const { name, email, password, description } = req.body;
+
+  if (!req.file) {
+    return next(new AppError('Please upload a file', 400));
+  }
 
   const imgRef = ref(storage, `users/${Date.now()}-${req.file.originalname}`);
   const imgUpload = await uploadBytes(imgRef, req.file.buffer);
@@ -24,7 +28,14 @@ exports.signUp = catchAsync(async (req, res, next) => {
     profileImgUrl: imgUpload.metadata.fullPath,
   });
 
-  const token = await generateJWT(user.id);
+  const tokenPromise = generateJWT(user.id);
+
+  const imgRefToDownload = ref(storage, user.profileImgUrl);
+  const urlPromise = getDownloadURL(imgRefToDownload);
+
+  const [token, url] = await Promise.all([tokenPromise, urlPromise]);
+
+  user.profileImgUrl = url;
 
   res.status(200).json({
     status: 'success',
@@ -61,7 +72,14 @@ exports.signIn = catchAsync(async (req, res, next) => {
   }
 
   //4. generar el token
-  const token = await generateJWT(user.id);
+  const tokenPromise = generateJWT(user.id);
+
+  const imgRef = ref(storage, user.profileImgUrl);
+  const urlPromise = getDownloadURL(imgRef);
+
+  const [token, url] = await Promise.all([tokenPromise, urlPromise]);
+
+  user.profileImgUrl = url;
 
   res.status(200).json({
     status: 'success',
