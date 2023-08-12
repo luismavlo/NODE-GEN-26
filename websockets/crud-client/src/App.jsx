@@ -1,13 +1,53 @@
+import { useEffect, useState } from "react";
 import { StudentAdd } from "./components/StudentAdd";
 import { StudentList } from "./components/StudentList";
+import { io } from "socket.io-client";
+
+const connectionSocketServer = () => {
+  const socket = io.connect("http://localhost:3000", {
+    transports: ["websocket"],
+  });
+
+  return socket;
+};
 
 function App() {
+  const [socket] = useState(connectionSocketServer());
+  const [online, setOnline] = useState(false);
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    setOnline(socket.connected);
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      setOnline(true);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("disconnect", () => {
+      setOnline(false);
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    socket.on("current-students", (students) => {
+      console.log(students);
+      setStudents(students);
+    });
+  }, [socket]);
+
   return (
     <section className="container">
       <header className="alert">
         <h4>Services Status</h4>
-        <span className="text-success">Online</span>
-        <span className="text-danger">Offline</span>
+        {online ? (
+          <span className="text-success">Online</span>
+        ) : (
+          <span className="text-danger">Offline</span>
+        )}
 
         <h1>Students Node Gen26</h1>
         <hr />
