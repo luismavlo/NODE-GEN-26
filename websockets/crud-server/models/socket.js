@@ -9,7 +9,10 @@ class Socket {
   }
 
   socketsEvents() {
-    console.log(this.studentList.getStudents());
+    //ESCUCHANDO TODOS LOS CLIENTES QUE SE CONECTAN
+    this.io.on('connection', (socket) => {
+      socket.emit('current-students', this.studentList.getStudents());
+    });
   }
 }
 
