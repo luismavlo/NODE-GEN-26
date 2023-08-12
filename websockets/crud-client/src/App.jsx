@@ -39,6 +39,18 @@ function App() {
     });
   }, [socket]);
 
+  const vote = (id) => {
+    socket.emit("vote-student", id);
+  };
+
+  const deleteStudent = (id) => {
+    socket.emit("delete-student", id);
+  };
+
+  const changeStudentName = (id, name) => {
+    socket.emit("change-student-name", { id, name });
+  };
+
   return (
     <section className="container">
       <header className="alert">
@@ -55,7 +67,12 @@ function App() {
 
       <article className="row">
         <div className="col-8">
-          <StudentList />
+          <StudentList
+            data={students}
+            vote={vote}
+            deleteStudent={deleteStudent}
+            changeStudentName={changeStudentName}
+          />
         </div>
         <div className="col-4">
           <StudentAdd />
