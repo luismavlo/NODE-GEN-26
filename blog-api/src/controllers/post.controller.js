@@ -89,7 +89,7 @@ exports.findMyPosts = catchAsync(async (req, res, next) => {
       const postImgsResolved = await Promise.all(postImgsPromises);
       post.PostImgs = postImgsResolved;
 
-      return post;
+      // return post;
     });
 
     await Promise.all(postPromises);
