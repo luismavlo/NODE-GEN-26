@@ -1,4 +1,4 @@
-[Esto es una imagen de express](https://dkrn4sk0rn31v.cloudfront.net/uploads/2020/12/o-que-e-o-express-js.png)
+![Esto es una imagen de express](https://dkrn4sk0rn31v.cloudfront.net/uploads/2020/12/o-que-e-o-express-js.png)
 
 # Blog Api
 
