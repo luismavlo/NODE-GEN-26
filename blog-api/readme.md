@@ -49,6 +49,7 @@ almacenar la información.
 5. clonar el .env.template y renombrarlo a .env
 6. llenar las variables de entorno
 7. levantar el modo de desarrollo utilizando el comando:
-   ```
-    npm run start:dev
-   ```
+
+```
+  npm run start:dev
+```
