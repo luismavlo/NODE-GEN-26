@@ -1,6 +1,6 @@
 const { ref, getDownloadURL } = require("firebase/storage");
 const PostImg = require("./../models/postImg.model");
-const Post = require('./../models/post.model');
+const { Post } = require('./../models/post.model');
 const User = require('./../models/user.model');
 const AppError = require('./../utils/appError');
 const storage = require('./../utils/firebase');
@@ -43,8 +43,8 @@ class PostService {
       const urlProfileUser = await getDownloadURL(imgRefUserProfile);
 
       post.user.profileImgUrl = urlProfileUser;
-      
-      const postImgsPromises = post.postImgs.map(async (postImg) => {
+      console.log(post)
+      const postImgsPromises = post.PostImgs.map(async (postImg) => {
         const imgRef = ref(storage, postImg.postImgUrl);
         const url = await getDownloadURL(imgRef);
 

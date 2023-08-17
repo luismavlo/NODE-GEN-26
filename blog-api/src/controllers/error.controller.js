@@ -22,7 +22,7 @@ const sendErrorDev = (err, res) => {
     message: err.message,
     stack: err.stack,
   });
-
+  console.log(err)
   return res.status(err.statusCode).json({
     status: err.status,
     message: err.message,

@@ -12,13 +12,13 @@ const router = express.Router();
 
 router.use(authMiddleware.protect);
 
-router
-  .route('/')
-  .get(commentController.findAllComment)
-  .post(
-    validationMiddleware.createCommentValidation,
-    commentController.createComment
-  );
+router.route('/').get(commentController.findAllComment);
+
+router.post(
+  '/:id',
+  validationMiddleware.createCommentValidation,
+  commentController.createComment
+);
 
 router
   .use('/:id', commentMiddleware.validComment)
